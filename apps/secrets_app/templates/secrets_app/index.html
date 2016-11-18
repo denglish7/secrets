@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+        <title></title>
+         {% load humanize %}
+    </head>
+    <body>
+        <div class="wrapper">
+            <form class="" action="{%url 'secrets:logoff' %}" method="post">
+                {% csrf_token %}
+                <input type="submit" name="" value="Log off">
+            </form>
+            <h4>Hello, {{user.first_name}}</h4>
+            <form action="/secrets/new" method="post">
+              {% csrf_token %}
+                <textarea name="textbox" rows="8" cols="40" placeholder="Your secret here..."></textarea>
+                <button type="submit" name="post">Post</button>
+            </form>
+            <h4>Recent Secrets:</h4>
+            {% if secrets %}
+                {% for secret in secrets %}
+                    <p>
+                    {{secret.content}} ({{secret.created_at|naturaltime}}) <span class='italics'>{{secret.like_users.count}} likes</span>
+                    {% if secret.secret_user.id == request.session.userid %}
+                        <span class='green'>You posted this</span>
+                        <a href="/secrets/destroy_user/{{secret.id}}">Delete</a>
+                    {% else %}
+                        {% if user in secret.like_users.all %}
+                            <span class='green'>You liked this</span>
+                        {% else %}
+                            <a class='green' href="/secrets/like_user/{{secret.id}}">Like</a>
+                        {% endif %}
+                    {% endif %}
+                    </p>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </body>
+</html>
